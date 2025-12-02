@@ -3,6 +3,7 @@
   "description": "Collection of third party Desktop apps build using Tauri for different websites.",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "tauri dev",
     "build": "tauri build",
