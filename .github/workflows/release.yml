@@ -94,8 +94,10 @@ jobs:
               with:
                 targets: x86_64-unknown-linux-gnu
 
-            - name: Install Linux build dependencies
-              run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential libssl-dev libgtk-3-dev squashfs-tools
+            - name: Install system dependencies
+              run: |
+                sudo apt-get update
+                sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
             - name: Install npm dependencies
               run: npm install
@@ -177,47 +179,62 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                 name: windows-installers
+                path: windows-installers/
 
             - name: Download Windows portable
               uses: actions/download-artifact@v4
               with:
                 name: windows-portable
+                path: windows-portable/
 
             - name: Download Linux artifacts
               uses: actions/download-artifact@v4
               with:
                 name: linux-installers
+                path: linux-installers/
 
             - name: Download macOS artifacts
               uses: actions/download-artifact@v4
               with:
                 name: macos-installers
-
-            - name: Prepare release assets
-              run: |
-                mkdir release-assets
-                mv windows-installers/* release-assets/
-                mv windows-portable/* release-assets/
-                mv linux-installers/* release-assets/
-                mv macos-installers/* release-assets/
+                path: macos-installers/
 
             - name: Extract app name from commit message
               id: extract_app
               env:
                 COMMIT_MSG: ${{ github.event.head_commit.message }}
+              shell: bash
               run: |
-                if [[ "$COMMIT_MSG" =~ release\(([^)]+)\): ]]; then
-                    APP_NAME="${BASH_REMATCH[1]}"
+                if [[ "$COMMIT_MSG" == *"release("*")"* ]]; then
+                  temp="${COMMIT_MSG#*release(}"
+                  APP_NAME="${temp%)*}"
                 else
-                    APP_NAME="unknown-app"
+                  APP_NAME="unknown-app"
                 fi
                 echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
 
+            - name: Debug - List files before release
+              run: |
+                echo "=== Current directory structure ==="
+                echo "=== Windows installers ==="
+                find windows-installers -type f 2>/dev/null || echo "No windows-installers directory"
+                echo "=== Windows portable ==="
+                find windows-portable -type f 2>/dev/null || echo "No windows-portable directory"
+                echo "=== Linux installers ==="
+                find linux-installers -type f 2>/dev/null || echo "No linux-installers directory"
+                echo "=== macOS installers ==="
+                find macos-installers -type f 2>/dev/null || echo "No macos-installers directory"
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:
-                tag_name: ${{ steps.extract_app.outputs.app_name }}-v${{ github.run_number }}
-                name: Release ${{ steps.extract_app.outputs.app_name }} v${{ github.run_number }}
+                tag_name: ${{ steps.extract_app.outputs.app_name }}
+                name: Release ${{ steps.extract_app.outputs.app_name }}
+                files: |
+                  windows-installers/**/*
+                  windows-portable/**/*
+                  linux-installers/**/*
+                  macos-installers/**/*
+
                 body: |
                   # 🚀 ${{ steps.extract_app.outputs.app_name }} Desktop App Release
 

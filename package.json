@@ -7,7 +7,7 @@
   "scripts": {
     "start": "tauri dev",
     "build": "tauri build",
-    "icons": "node ./scripts/icons.js",
+    "icons": "node ./scripts/Icons.js",
     "release": "node ./scripts/release.js"
   },
   "keywords": [
