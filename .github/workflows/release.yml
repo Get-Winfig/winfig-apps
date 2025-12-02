@@ -1,0 +1,273 @@
+name: Build and Release Tauri Apps
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "scripts/config.json"
+            - "scripts/Icons/**.*"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    packages: write
+
+env:
+    CARGO_INCREMENTAL: 0
+
+jobs:
+    build-windows:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                targets: x86_64-pc-windows-msvc
+
+            - name: Install WebView2
+              run: |
+                powershell -Command "Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -Destination 'C:/WebView2Bootstrapper.exe'"
+                C:/WebView2Bootstrapper.exe /silent /install
+
+            - name: Install npm dependencies
+              run: npm install
+
+            - name: Run Icons Script
+              env:
+                 COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: npm run icons
+
+            - name: Run release Script
+              env:
+                 COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: npm run release
+
+            - name: Build App
+              run: npm run build
+
+            - name: Upload Windows Installer (NSIS and MSI)
+              uses: actions/upload-artifact@v4
+              with:
+                name: windows-installers
+                path: |
+                    src-tauri/target/release/bundle/nsis/*.exe
+                    src-tauri/target/release/bundle/msi/*.msi
+                if-no-files-found: error
+                retention-days: 7
+
+            - name: Upload Portable Executable
+              uses: actions/upload-artifact@v4
+              with:
+                name: windows-portable
+                path: src-tauri/target/release/*.exe
+                if-no-files-found: error
+                retention-days: 7
+
+    build-linux:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                targets: x86_64-unknown-linux-gnu
+
+            - name: Install Linux build dependencies
+              run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential libssl-dev libgtk-3-dev squashfs-tools
+
+            - name: Install npm dependencies
+              run: npm install
+
+            - name: Run Icons Script
+              env:
+                 COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: npm run icons
+
+            - name: Run release Script
+              env:
+                 COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: npm run release
+
+            - name: Build App
+              run: npm run build
+
+            - name: Upload Linux Installers
+              uses: actions/upload-artifact@v4
+              with:
+                name: linux-installers
+                path: |
+                    src-tauri/target/release/bundle/deb/*.deb
+                    src-tauri/target/release/*.AppImage
+                if-no-files-found: error
+                retention-days: 7
+
+    build-macos:
+        runs-on: macos-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                targets: x86_64-apple-darwin
+
+            - name: Install npm dependencies
+              run: npm install
+
+            - name: Run Icons Script
+              env:
+                 COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: npm run icons
+
+            - name: Run release Script
+              env:
+                 COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: npm run release
+
+            - name: Build App
+              run: npm run build
+
+            - name: Upload macOS Installers
+              uses: actions/upload-artifact@v4
+              with:
+                name: macos-installers
+                path: |
+                    src-tauri/target/release/bundle/dmg/*.dmg
+                    src-tauri/target/release/*.app
+                if-no-files-found: error
+                retention-days: 7
+
+    create-release:
+        runs-on: ubuntu-latest
+        needs: [build-windows, build-linux, build-macos]
+        if: success()
+        steps:
+            - name: Download Windows artifacts
+              uses: actions/download-artifact@v4
+              with:
+                name: windows-installers
+
+            - name: Download Windows portable
+              uses: actions/download-artifact@v4
+              with:
+                name: windows-portable
+
+            - name: Download Linux artifacts
+              uses: actions/download-artifact@v4
+              with:
+                name: linux-installers
+
+            - name: Download macOS artifacts
+              uses: actions/download-artifact@v4
+              with:
+                name: macos-installers
+
+            - name: Prepare release assets
+              run: |
+                mkdir release-assets
+                mv windows-installers/* release-assets/
+                mv windows-portable/* release-assets/
+                mv linux-installers/* release-assets/
+                mv macos-installers/* release-assets/
+
+            - name: Extract app name from commit message
+              id: extract_app
+              env:
+                COMMIT_MSG: ${{ github.event.head_commit.message }}
+              run: |
+                if [[ "$COMMIT_MSG" =~ release\(([^)]+)\): ]]; then
+                    APP_NAME="${BASH_REMATCH[1]}"
+                else
+                    APP_NAME="unknown-app"
+                fi
+                echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                tag_name: ${{ steps.extract_app.outputs.app_name }}-v${{ github.run_number }}
+                name: Release ${{ steps.extract_app.outputs.app_name }} v${{ github.run_number }}
+                body: |
+                  # 🚀 ${{ steps.extract_app.outputs.app_name }} Desktop App Release
+
+                  Welcome to the latest release of **${{ steps.extract_app.outputs.app_name }}**!
+
+                  ## 📦 Download Options
+
+                  - **Windows:**
+                    - NSIS Installer (`.exe`)
+                    - MSI Installer (`.msi`)
+                    - Portable Executable (`.exe`)
+                  - **macOS:**
+                    - DMG Installer (`.dmg`)
+                    - Standalone App (`.app`)
+                  - **Linux:**
+                    - DEB Package (`.deb`)
+                    - AppImage (`.AppImage`)
+
+                  ## 🛠️ How to Use
+
+                  1. Download the installer or portable version for your OS.
+                  2. Run the installer and follow the instructions, or launch the portable app directly.
+                  3. Enjoy a seamless desktop experience for your favorite web app!
+
+                  ## ✨ Features
+
+                  - Fast, secure, and installable desktop wrapper for the web app
+                  - No modifications to website content or services
+                  - Automatic updates (if supported)
+                  - Cross-platform: Windows, macOS, Linux
+
+
+                  ## ⚠️ Legal Disclaimer & Copyright Notice
+
+                  This application is a desktop wrapper for a third-party website, provided solely for convenience and educational purposes.
+
+                  - The author and contributors **do not own, operate, or control** the website or its content.
+                  - **No modifications, alterations, or interference** are made to the website, its services, or its data.
+                  - All copyrights, trademarks, logos, and intellectual property remain the exclusive property of their respective owners.
+                  - This project is **not affiliated with, endorsed by, sponsored by, or officially connected to** the website or its creators in any way.
+                  - The author and contributors **make no claims of ownership or rights** to the website, its content, or its brand.
+                  - This software is distributed "AS IS" without warranty of any kind. **Use at your own risk.**
+                  - By downloading or using this application, you agree that the author and contributors are **not liable for any damages, losses, or legal issues** arising from its use.
+
+                  ## 📝 Takedown Requests
+
+                  If you are a copyright, trademark, or intellectual property owner and wish to request removal of any content, please use the dedicated **Takedown Issue Template** in this repository's Issues section. Your request will be reviewed and acted upon promptly.
+
+                  ---
+                  *Built automatically with GitHub Actions. Commit: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})*
+
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
