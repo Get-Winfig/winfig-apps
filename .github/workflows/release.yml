@@ -1,0 +1,328 @@
+#  GitHub Actions Workflow  to build apps for different platforms and create a release
+
+name: Build and Release Winfig Apps
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "scripts/apps.json"
+            - "scripts/Icons/**.*"
+
+permissions:
+    contents: write
+    packages: write
+
+env:
+    CARGO_INCREMENTAL: 0
+    NODE_ENV: production
+    NPM_CONFIG_CACHE: ${{ github.workspace }}/.npm-cache
+    TAURI_BUILD_CACHE: ${{ github.workspace }}/.tauri-cache
+
+jobs:
+     build-windows:
+        runs-on: windows-latest
+        continue-on-error: false
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Setup Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: x86_64-pc-windows-msvc
+
+            - name: Install WebView2 Runtime (if not already installed)
+              run: |
+                    $webview2 = Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F1E7EE4B-6B6E-4B3A-8C7D-8C7D8C7D8C7D}" -ErrorAction SilentlyContinue
+                    if (-not $webview2) {
+                        Start-BitsTransfer -Source 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -Destination 'C:/WebView2Bootstrapper.exe'
+                        C:/WebView2Bootstrapper.exe /silent /install
+                    } else {
+                        Write-Host "WebView2 Runtime is already installed."
+                    }
+              shell: powershell
+
+            - name: Install npm dependencies
+              run: |
+                    npm install
+                    npm install -g @tauri-apps/cli
+
+            - name: Run Icons Script
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: |
+                    npm run icons
+
+            - name: Run release Script
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: |
+                    npm run release
+
+            - name: Build App
+              run: |
+                    npm run build
+
+            - name: Upload Portable Executable
+              uses: actions/upload-artifact@v4
+              with:
+                    name: windows-portable
+                    path: |
+                            src-tauri/target/release/*.exe
+                    if-no-files-found: error
+                    retention-days: 7
+
+            - name: Upload Windows Installer (NSIS and MSI)
+              uses: actions/upload-artifact@v4
+              with:
+                    name: windows-installers
+                    path: |
+                            src-tauri/target/release/bundle/nsis/*.exe
+                            src-tauri/target/release/bundle/msi/*.msi
+                    if-no-files-found: error
+                    retention-days: 7
+
+     build-linux:
+        runs-on: ubuntu-latest
+        continue-on-error: true
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: x86_64-unknown-linux-gnu
+
+            - name: Install system dependencies
+              run: |
+                    sudo apt-get update
+                    sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+            - name: Install npm dependencies
+              run: |
+                    npm install
+                    npm install -g @tauri-apps/cli
+
+            - name: Run Icons Script
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: |
+                    npm run icons
+
+            - name: Run release Script
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: |
+                    npm run release
+
+            - name: Build App
+              run: |
+                    npm run build
+
+            - name: Upload Linux Installers/AppImages
+              uses: actions/upload-artifact@v4
+              with:
+                    name: linux-installers
+                    path: |
+                            src-tauri/target/release/bundle/deb/*.deb
+                            src-tauri/target/release/bundle/**/*.AppImage
+                    if-no-files-found: error
+                    retention-days: 7
+
+     build-macos:
+        runs-on: macos-latest
+        continue-on-error: true
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Set up Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                targets: |
+                          x86_64-apple-darwin
+
+            - name: Install npm dependencies
+              run: |
+                    npm install
+                    npm install -g @tauri-apps/cli
+
+            - name: Run Icons Script
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: |
+                    npm run icons
+
+            - name: Run release Script
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              run: |
+                    npm run release
+            - name: Build App
+              run: |
+                    npm run build
+
+            - name: Upload macOS Installers
+              uses: actions/upload-artifact@v4
+              with:
+                    name: macos-installers
+                    path: |
+                            src-tauri/target/release/bundle/dmg/*.dmg
+                            src-tauri/target/release/bundle/**/*.app
+                    if-no-files-found: error
+                    retention-days: 7
+
+     create-release:
+        runs-on: ubuntu-latest
+        needs:
+            - build-windows
+            - build-linux
+            - build-macos
+        steps:
+            - name: Download Windows artifacts (Portable)
+              uses: actions/download-artifact@v4
+              with:
+                    name: windows-portable
+                    path: windows-portable/
+
+            - name: Download Windows artifacts (Installers)
+              uses: actions/download-artifact@v4
+              with:
+                    name: windows-installers
+                    path: windows-installers/
+
+            - name: Download macOS artifacts
+              uses: actions/download-artifact@v4
+              with:
+                    name: macos-installers
+                    path: macos-installers/
+
+            - name: Download Linux artifacts
+              uses: actions/download-artifact@v4
+              with:
+                    name: linux-installers
+                    path: linux-installers/
+
+            - name: Extract app name from commit message
+              id: extract_app
+              env:
+                  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+              shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+              run: |
+                    APP_NAME=$(echo "$COMMIT_MESSAGE" | grep -oiP 'release\(\K[^\)]+(?=\):)' | head -n1 || true)
+                    if [[ -z "$APP_NAME" ]]; then
+                      APP_NAME="unknown-app"
+                      echo $APP_NAME
+                    fi
+                      echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+                      echo $APP_NAME
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+
+              with:
+                    tag_name: ${{ steps.extract_app.outputs.app_name }}
+                    name: Release ${{ steps.extract_app.outputs.app_name }}
+                    draft: true
+                    prerelease: false
+                    files: |
+                            windows-portable/**/*.exe
+                            windows-installers/**/*.exe
+                            windows-installers/**/*.msi
+                            macos-installers/**/*.app
+                            macos-installers/**/*.dmg
+                            linux-installers/**/*.deb
+                            linux-installers/**/*.AppImage
+
+                    body: |
+                            # 🚀 ${{ steps.extract_app.outputs.app_name }} Desktop App Release
+
+                            Welcome to the latest release of **${{ steps.extract_app.outputs.app_name }}**!
+
+                            ## 📦 Download Options
+
+                            - **Windows**
+                                - MSI Installer: `.msi`
+                                - NSIS Installer: `.exe`
+                                - Portable Executable: `.exe`
+
+                            - **macOS**
+                                - DMG Installer: `.dmg`
+                                - Application Bundle: `.app`
+
+                            - **Linux**
+                                - DEB Package: `.deb`
+                                - AppImage: `.AppImage`
+
+                            ## 🛠️ How to Use
+
+                            1. Download the appropriate installer or package for your operating system.
+                            2. Run the installer and follow the instructions, or launch the portable app directly.
+                            3. Enjoy using **${{ steps.extract_app.outputs.app_name }}** on your desktop!
+
+                            > Enjoy a seamless desktop experience for your favorite web app!
+
+                            ## Why WebView2 Runtime?
+
+                            The WebView2 Runtime is required to run this desktop application. It provides a modern web rendering engine based on Microsoft Edge (Chromium). If you don't have it installed, the application will prompt you to download and install it for the best experience.
+
+                            ## ✨ Features
+
+                            - Fast, secure, and installable desktop wrapper for the web app
+                            - No need for users to have a separate browser installed
+                            - No modifications to website content or services
+                            - No Updates required for website changes
+                            - Easy installation and setup process
+
+                            ## ⚠️ Legal Disclaimer & Copyright Notice
+
+                            This desktop application is a third-party wrapper for the web application **${{ steps.extract_app.outputs.app_name }}**, provided solely for convenience and educational purposes. It is not affiliated with, endorsed by, or sponsored by the original web application or its developers.
+
+                            - The author and contributors **do not own, operate, or control** the website or its content.
+                            - **No modifications, alterations, or interference** are made to the website, its services, or its data.
+                            - All copyrights, trademarks, logos, and intellectual property remain the exclusive property of their respective owners.
+                            - This project is **not affiliated with, endorsed by, sponsored by, or officially connected to** the website or its creators in any way.
+                            - The author and contributors **make no claims of ownership or rights** to the website, its content, or its brand.
+                            - This software is distributed "AS IS" without warranty of any kind. **Use at your own risk.**
+                            - By downloading or using this application, you agree that the author and contributors are **not liable for any damages, losses, or legal issues** arising from its use.
+                            - All trademarks, service marks, logos, and brand names are the property of their respective owners.
+
+                            Please respect the rights of the original content creators and use this application responsibly.
+
+                            ## 📝 Takedown Requests
+
+                            If you are the owner of the web application or have legal authority over its content and wish to request the removal of this desktop application, please contact the repository owner directly through GitHub or dedicated **Takedown Issue Template** in this repository's Issues section. Your request will be reviewed and acted upon promptly.
+
+                            ---
+
+                            *Built automatically with GitHub Actions. Commit: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})*
+
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
