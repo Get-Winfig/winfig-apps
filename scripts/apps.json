@@ -23,6 +23,14 @@
             "windowsTitle": "NetAcad - Cisco Networking Academy",
             "appLink": "https://www.netacad.com",
             "appTitle": "NetAcad"
+        },
+        "HackTheBox":{
+            "productName": "HackTheBox",
+            "description": "Online platform for cybersecurity training and challenges.",
+            "appIdentifier": "com.hackthebox",
+            "windowsTitle": "HackTheBox - Cybersecurity Training",
+            "appLink": "https://www.hackthebox.com",
+            "appTitle": "HackTheBox"
         }
     }
 }
