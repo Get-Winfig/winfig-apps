@@ -15,6 +15,14 @@
             "windowsTitle": "AnyRun - Interactive Malware Analysis",
             "appLink": "https://app.any.run",
             "appTitle": "AnyRun"
+        },
+        "NetAcad":{
+            "productName": "NetAcad",
+            "description": "Cisco Networking Academy",
+            "appIdentifier": "com.cisco.netacad",
+            "windowsTitle": "NetAcad - Cisco Networking Academy",
+            "appLink": "https://www.netacad.com",
+            "appTitle": "NetAcad"
         }
     }
 }
