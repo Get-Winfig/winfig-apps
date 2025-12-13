@@ -1,0 +1,105 @@
+name: Takedown Request
+title: "[Takedown] <Web App Name or URL>"
+description: "Request removal of a desktop wrapper for a web app due to copyright or other legal reasons."
+labels: takedown-request
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the following details to request a takedown of a desktop wrapper for a web app.
+
+  - type: input
+    id: contact_name
+    attributes:
+      label: "Name"
+      description: "Your full name."
+    validations:
+      required: true
+
+  - type: input
+    id: contact_email
+    attributes:
+      label: "Email"
+      description: "Your email address."
+    validations:
+      required: false
+
+  - type: input
+    id: contact_org
+    attributes:
+      label: "Organization (if applicable)"
+      description: "Your organization, if you represent one."
+    validations:
+      required: false
+
+  - type: textarea
+    id: proof
+    attributes:
+      label: "Proof of Ownership or Authority"
+      description: "Provide evidence that you own or represent the web app or its content (e.g., official email, documentation, or a message from a verified domain)."
+    validations:
+      required: true
+
+  - type: input
+    id: app_name
+    attributes:
+      label: "Web App Name"
+      description: "Name of the web app."
+    validations:
+      required: true
+
+  - type: input
+    id: app_url
+    attributes:
+      label: "Web App URL"
+      description: "URL of the web app."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: "Reason for Takedown"
+      description: "Explain the legal or other reason for this request (e.g., copyright, trademark, privacy, etc.)."
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: "Details of the Request"
+      description: "Any additional information or context."
+    validations:
+      required: false
+
+  - type: textarea
+    id: supporting_docs
+    attributes:
+      label: "Supporting Documents or Links"
+      description: "Provide links or describe any supporting documents (legal notices, screenshots, etc.)."
+    validations:
+      required: false
+
+  - type: input
+    id: urgency
+    attributes:
+      label: "Urgency/Deadline"
+      description: "Is this request time-sensitive? Please specify any deadlines."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: "Confirmation"
+      description: "I confirm that I am authorized to make this request and that the information provided is accurate."
+      options:
+        - label: "Yes"
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping us maintain a respectful and lawful community.
+        **Note:** Issues are public. Do not share sensitive information here. If needed, request a private communication channel.
