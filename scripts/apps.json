@@ -7,6 +7,14 @@
             "windowsTitle": "VirusTotal - File Scanner",
             "appLink": "https://www.virustotal.com/gui/home/upload",
             "appTitle": "VirusTotal"
+        },
+        "AnyRun": {
+            "productName": "AnyRun",
+            "description": "AnyRun Desktop Application",
+            "appIdentifier": "com.anyrun.desktop",
+            "windowsTitle": "AnyRun - Interactive Malware Analysis",
+            "appLink": "https://app.any.run",
+            "appTitle": "AnyRun"
         }
     }
 }
