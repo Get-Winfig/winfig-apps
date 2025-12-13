@@ -1,0 +1,34 @@
+{
+    "name": "winfig-apps",
+    "description": "Collection of third party Desktop apps build using Tauri for different websites.",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "start": "tauri dev",
+        "build": "tauri build",
+        "icons": "node ./scripts/Icons.js",
+        "release": "node ./scripts/release.js"
+    },
+    "keywords": [
+        "winfig",
+        "desktop-apps",
+        "configuration",
+        "factory",
+        "tauri"
+    ],
+    "devDependencies": {
+        "@tauri-apps/cli": "^2"
+    },
+    "author": "Armoghan-ul-Mohmin",
+    "license": "MIT",
+    "homepage": "https://github.com/Get-Winfig/winfig-apps#readme",
+    "repository": {
+        "type": "git",
+        "branch": "main",
+        "url": "git+https://github.com/Get-Winfig/winfig-apps.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Get-Winfig/winfig-apps/issues"
+    }
+}
