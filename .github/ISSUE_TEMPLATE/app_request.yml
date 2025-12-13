@@ -1,0 +1,76 @@
+name: "App Request"
+description: "Request a new app to be added to Winfig"
+title: "[App Request] <App Name>"
+labels: ["app request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Note:** Only request web apps that do not have official desktop applications.
+        Requests for apps with existing desktop versions will not be considered.
+
+        **Duplicate Check:**
+        Please search existing issues to make sure this app has not already been requested.
+
+  - type: input
+    id: app_name
+    attributes:
+      label: App Name
+      description: What is the name of the app you want to request?
+      placeholder: "e.g. Spotify"
+    validations:
+      required: true
+
+  - type: input
+    id: app_url
+    attributes:
+      label: App URL
+      description: Link to the official website or web app.
+      placeholder: "https://www.spotify.com"
+    validations:
+      required: true
+
+  - type: input
+    id: app_category
+    attributes:
+      label: Category/Type of App
+      description: What type of app is this? (e.g. Productivity, Social, Entertainment, etc.)
+      placeholder: "e.g. Productivity"
+    validations:
+      required: true
+
+  - type: input
+    id: app_region
+    attributes:
+      label: Region Restrictions
+      description: Is the app available globally or restricted to certain countries?
+      placeholder: "e.g. Global, US only, EU only"
+    validations:
+      required: false
+
+  - type: textarea
+    id: app_description
+    attributes:
+      label: App Description
+      description: Briefly describe what this app does and why it should be added.
+      placeholder: "Spotify is a music streaming service..."
+    validations:
+      required: true
+
+  - type: input
+    id: app_icon
+    attributes:
+      label: App Icon URL
+      description: Link to an icon for the app (if available).
+      placeholder: "https://example.com/icon.png"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: Any other relevant information or notes.
+      placeholder: "Supports dark mode, requires login, etc."
+    validations:
+      required: false
