@@ -1,5 +1,12 @@
 {
     "apps": {
-
+        "VirusTotal": {
+            "productName": "VirusTotal",
+            "description": "VirusTotal Desktop Application",
+            "appIdentifier": "com.virustotal.desktop",
+            "windowsTitle": "VirusTotal - File Scanner",
+            "appLink": "https://www.virustotal.com/gui/home/upload",
+            "appTitle": "VirusTotal"
+        }
     }
 }
