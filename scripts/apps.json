@@ -63,6 +63,14 @@
             "windowsTitle": "CTFHacker101 - Learn Web Security",
             "appLink": "https://ctf.hacker101.com",
             "appTitle": "CTFHacker101"
+        },
+        "CyberDefenders":{
+            "productName": "CyberDefenders",
+            "description": "CyberDefenders - Learn Cybersecurity",
+            "appIdentifier": "com.cyberdefenders",
+            "windowsTitle": "CyberDefenders - Learn Cybersecurity",
+            "appLink": "https://cyberdefenders.org",
+            "appTitle": "CyberDefenders"
         }
     }
 }
