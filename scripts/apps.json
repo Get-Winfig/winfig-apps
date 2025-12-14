@@ -47,6 +47,14 @@
             "windowsTitle": "TryHackMe - Learn Cybersecurity",
             "appLink": "https://tryhackme.com",
             "appTitle": "TryHackMe"
+        },
+        "PicoCTF":{
+            "productName": "PicoCTF",
+            "description": "PicoCTF - Cybersecurity Challenges for Beginners",
+            "appIdentifier": "com.picocft.desktop",
+            "windowsTitle": "PicoCTF - Learn Cybersecurity",
+            "appLink": "https://picoctf.org",
+            "appTitle": "PicoCTF"
         }
     }
 }
