@@ -71,6 +71,14 @@
             "windowsTitle": "CyberDefenders - Learn Cybersecurity",
             "appLink": "https://cyberdefenders.org",
             "appTitle": "CyberDefenders"
+        },
+        "LetsDefend":{
+            "productName": "LetsDefend",
+            "description": "LetsDefend - Learn Cybersecurity",
+            "appIdentifier": "com.letsdefend",
+            "windowsTitle": "LetsDefend - Learn Cybersecurity",
+            "appLink": "https://letsdefend.io",
+            "appTitle": "LetsDefend"
         }
     }
 }
