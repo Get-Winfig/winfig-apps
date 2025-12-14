@@ -79,6 +79,14 @@
             "windowsTitle": "LetsDefend - Learn Cybersecurity",
             "appLink": "https://letsdefend.io",
             "appTitle": "LetsDefend"
+        },
+        "PortSwigger":{
+            "productName": "PortSwigger",
+            "description": "PortSwigger - Web Security Academy",
+            "appIdentifier": "com.portswigger",
+            "windowsTitle": "PortSwigger - Web Security Academy",
+            "appLink": "https://portswigger.net",
+            "appTitle": "PortSwigger"
         }
     }
 }
