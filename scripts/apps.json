@@ -39,6 +39,14 @@
             "windowsTitle": "HackTheBox Academy - Cybersecurity Training",
             "appLink": "https://academy.hackthebox.com",
             "appTitle": "HTBAcademy"
+        },
+        "TryHackMe":{
+            "productName": "TryHackMe",
+            "description": "TryHackMe - Cybersecurity Training Platform",
+            "appIdentifier": "com.tryhackme.desktop",
+            "windowsTitle": "TryHackMe - Learn Cybersecurity",
+            "appLink": "https://tryhackme.com",
+            "appTitle": "TryHackMe"
         }
     }
 }
