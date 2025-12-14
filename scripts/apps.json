@@ -31,6 +31,14 @@
             "windowsTitle": "HackTheBox - Cybersecurity Training",
             "appLink": "https://www.hackthebox.com",
             "appTitle": "HackTheBox"
+        },
+        "HTBAcademy":{
+            "productName": "HTBAcademy",
+            "description": "Online platform for cybersecurity training and challenges.",
+            "appIdentifier": "com.hackthebox.academy",
+            "windowsTitle": "HackTheBox Academy - Cybersecurity Training",
+            "appLink": "https://academy.hackthebox.com",
+            "appTitle": "HTBAcademy"
         }
     }
 }
