@@ -55,6 +55,14 @@
             "windowsTitle": "PicoCTF - Learn Cybersecurity",
             "appLink": "https://picoctf.org",
             "appTitle": "PicoCTF"
+        },
+        "CTFHacker101":{
+            "productName": "CTFHacker101",
+            "description": "CTFHacker101 - Learn Web Security",
+            "appIdentifier": "com.CTFHacker101",
+            "windowsTitle": "CTFHacker101 - Learn Web Security",
+            "appLink": "https://ctf.hacker101.com",
+            "appTitle": "CTFHacker101"
         }
     }
 }
