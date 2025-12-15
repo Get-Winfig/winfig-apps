@@ -103,6 +103,14 @@
             "windowsTitle": "LOLbins - Living Off The Land Binaries",
             "appLink": "https://lolbas-project.github.io",
             "appTitle": "LOLbins"
+        },
+        "GTFOBins": {
+            "productName": "GTFOBins",
+            "description": "GTFOBins - Unix Binaries for Privilege Escalation",
+            "appIdentifier": "com.gtfobins.desktop",
+            "windowsTitle": "GTFOBins - Unix Binaries for Privilege Escalation",
+            "appLink": "https://gtfobins.github.io",
+            "appTitle": "GTFOBins"
         }
     }
 }
