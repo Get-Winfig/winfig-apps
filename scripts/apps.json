@@ -111,6 +111,14 @@
             "windowsTitle": "GTFOBins - Unix Binaries for Privilege Escalation",
             "appLink": "https://gtfobins.github.io",
             "appTitle": "GTFOBins"
+        },
+        "ExploitDB": {
+            "productName": "ExploitDB",
+            "description": "Exploit Database - Archive of Public Exploits and Vulnerabilities",
+            "appIdentifier": "com.exploitdb.desktop",
+            "windowsTitle": "ExploitDB - Public Exploits Archive",
+            "appLink": "https://www.exploit-db.com",
+            "appTitle": "ExploitDB"
         }
     }
 }
