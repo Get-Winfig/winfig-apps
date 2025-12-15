@@ -127,6 +127,14 @@
             "windowsTitle": "Shodan - Network Traffic Analysis",
             "appLink": "https://shodan.io",
             "appTitle": "Shodan"
+        },
+        "MITREATT&CK": {
+            "productName": "MITREATT&CK",
+            "description": "MITRE ATT&CK - A Knowledge Base for Adversary Behavior",
+            "appIdentifier": "com.mitre.attck",
+            "windowsTitle": "MITRE ATT&CK - Adversary Behavior",
+            "appLink": "https://attack.mitre.org",
+            "appTitle": "MITREATT&CK"
         }
     }
 }
