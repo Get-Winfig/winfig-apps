@@ -95,6 +95,14 @@
             "windowsTitle": "Censys - Internet-Wide Scan Data",
             "appLink": "https://search.censys.io",
             "appTitle": "Censys"
+        },
+        "LOLbins": {
+            "productName": "LOLbins",
+            "description": "Lolbins - Living Off The Land Binaries",
+            "appIdentifier": "com.lolbins.desktop",
+            "windowsTitle": "LOLbins - Living Off The Land Binaries",
+            "appLink": "https://lolbas-project.github.io",
+            "appTitle": "LOLbins"
         }
     }
 }
