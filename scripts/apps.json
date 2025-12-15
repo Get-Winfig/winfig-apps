@@ -87,6 +87,14 @@
             "windowsTitle": "PortSwigger - Web Security Academy",
             "appLink": "https://portswigger.net",
             "appTitle": "PortSwigger"
+        },
+        "Censys": {
+            "productName": "Censys",
+            "description": "Censys - Internet-Wide Scan Data",
+            "appIdentifier": "com.censys.desktop",
+            "windowsTitle": "Censys - Internet-Wide Scan Data",
+            "appLink": "https://search.censys.io",
+            "appTitle": "Censys"
         }
     }
 }
