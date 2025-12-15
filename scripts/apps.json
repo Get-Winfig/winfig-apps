@@ -119,6 +119,14 @@
             "windowsTitle": "ExploitDB - Public Exploits Archive",
             "appLink": "https://www.exploit-db.com",
             "appTitle": "ExploitDB"
+        },
+        "Shodan": {
+            "productName": "Shodan",
+            "description": "Shodan - A Tool for Analyzing and Visualizing Network Traffic",
+            "appIdentifier": "com.shodan.desktop",
+            "windowsTitle": "Shodan - Network Traffic Analysis",
+            "appLink": "https://shodan.io",
+            "appTitle": "Shodan"
         }
     }
 }
